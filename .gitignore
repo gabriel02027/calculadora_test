@@ -32,3 +32,7 @@ desktop.ini
 
 # Binario suelto de Windows que no pertenece al proyecto
 Microsoft.Services.Store.winmd
+# Scripts locales de configuracion que no son de la calculadora
+Cambiar proveedor Codex.cmd
+Cambiar proveedor Codex.ps1
+Configurar DeepSeek.cmd

@@ -25,8 +25,3 @@ node calculadora.test.js
 ### Publicar en GitHub Pages
 
 En el repositorio: **Settings → Pages → Source: Deploy from a branch**, rama `main`, carpeta `/ (root)`.
-
-## Scripts incluidos
-
-- `Cambiar proveedor Codex.cmd` / `Cambiar proveedor Codex.ps1` — lanza Codex CLI eligiendo proveedor (OpenAI o DeepSeek).
-- `Configurar DeepSeek.cmd` — apunta a `configurar-deepseek.ps1` (archivo que todavía no está en el repo).
