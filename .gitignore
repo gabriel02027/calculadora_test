@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secretos y entorno
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+
+# Logs y bases de datos locales
+*.log
+*.sqlite3
+*.db
+
+# SO / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Binario suelto de Windows que no pertenece al proyecto
+Microsoft.Services.Store.winmd

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora</title>
+  <style>
+    :root {
+      --fondo: #0f1720;
+      --panel: #18222e;
+      --tecla: #22303f;
+      --acento: #2f80ed;
+      --texto: #e8eef6;
+      --suave: #8fa3b8;
+      --error: #ff6b6b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: radial-gradient(circle at 20% 0%, #1d2c3d, var(--fondo) 60%);
+      color: var(--texto);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    .calculadora {
+      width: 100%;
+      max-width: 360px;
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+    }
+    .pantalla {
+      background: #101a24;
+      border-radius: 14px;
+      padding: 16px;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+    .expresion { color: var(--suave); font-size: 15px; min-height: 20px; }
+    .resultado { font-size: 38px; font-weight: 600; line-height: 1.15; min-height: 44px; }
+    .resultado.es-error { color: var(--error); font-size: 22px; }
+    .teclado {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      font: inherit;
+      font-size: 20px;
+      color: var(--texto);
+      background: var(--tecla);
+      border: 0;
+      border-radius: 12px;
+      padding: 16px 0;
+      cursor: pointer;
+      transition: background .12s ease, transform .06s ease;
+    }
+    button:hover { background: #2b3b4d; }
+    button:active { transform: scale(.97); }
+    button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+    .operador { color: #9dc4ff; }
+    .funcion { color: var(--suave); font-size: 17px; }
+    .igual { grid-column: span 3; background: var(--acento); color: #fff; font-weight: 600; }
+    .igual:hover { background: #2a72d4; }
+  </style>
+</head>
+<body>
+  <main class="calculadora">
+    <div class="pantalla">
+      <div class="expresion" id="expresion">&nbsp;</div>
+      <div class="resultado" id="resultado" aria-live="polite">0</div>
+    </div>
+
+    <div class="teclado" id="teclado">
+      <button class="funcion" data-accion="limpiar">C</button>
+      <button class="funcion" data-accion="borrar">⌫</button>
+      <button class="funcion" data-valor="(">(</button>
+      <button class="funcion" data-valor=")">)</button>
+
+      <button data-valor="7">7</button>
+      <button data-valor="8">8</button>
+      <button data-valor="9">9</button>
+      <button class="operador" data-valor="÷">÷</button>
+
+      <button data-valor="4">4</button>
+      <button data-valor="5">5</button>
+      <button data-valor="6">6</button>
+      <button class="operador" data-valor="×">×</button>
+
+      <button data-valor="1">1</button>
+      <button data-valor="2">2</button>
+      <button data-valor="3">3</button>
+      <button class="operador" data-valor="−">−</button>
+
+      <button class="funcion" data-accion="signo">±</button>
+      <button data-valor="0">0</button>
+      <button data-valor=".">.</button>
+      <button class="operador" data-valor="+">+</button>
+
+      <button class="operador" data-valor="^">^</button>
+      <button class="igual" data-accion="igual">=</button>
+    </div>
+  </main>
+
+  <script src="calculadora.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var core = window.Calculadora;
+      var pantallaExpresion = document.getElementById('expresion');
+      var pantallaResultado = document.getElementById('resultado');
+      var teclado = document.getElementById('teclado');
+
+      var entrada = '';
+      var ultimo = '0';
+
+      function pintar() {
+        pantallaExpresion.textContent = entrada === '' ? '\u00a0' : entrada;
+      }
+
+      function mostrarResultado(texto, esError) {
+        pantallaResultado.textContent = texto;
+        pantallaResultado.classList.toggle('es-error', Boolean(esError));
+      }
+
+      function previsualizar() {
+        if (entrada === '') {
+          ultimo = '0';
+        } else {
+          try {
+            ultimo = core.formatear(core.calcular(entrada));
+          } catch (error) {
+            /* expresión todavía incompleta: se conserva el último cálculo válido */
+          }
+        }
+        mostrarResultado(ultimo, false);
+      }
+
+      function refrescar() {
+        pintar();
+        previsualizar();
+      }
+
+      function agregar(texto) {
+        entrada += texto;
+        refrescar();
+      }
+
+      function limpiar() {
+        entrada = '';
+        refrescar();
+      }
+
+      function borrar() {
+        entrada = entrada.slice(0, -1);
+        refrescar();
+      }
+
+      function cambiarSigno() {
+        if (entrada === '') {
+          entrada = '-';
+        } else if (/^-\(.*\)$/.test(entrada)) {
+          entrada = entrada.slice(2, -1);
+        } else {
+          entrada = '-(' + entrada + ')';
+        }
+        refrescar();
+      }
+
+      function igual() {
+        if (entrada === '') { return; }
+        try {
+          var texto = core.formatear(core.calcular(entrada));
+          pantallaExpresion.textContent = entrada + ' =';
+          mostrarResultado(texto, false);
+          entrada = texto;
+          ultimo = texto;
+        } catch (error) {
+          pantallaExpresion.textContent = entrada;
+          mostrarResultado(error.message, true);
+          entrada = '';
+          ultimo = '0';
+        }
+      }
+
+      teclado.addEventListener('click', function (evento) {
+        var boton = evento.target.closest('button');
+        if (!boton) { return; }
+
+        if (boton.dataset.valor) { agregar(boton.dataset.valor); return; }
+
+        switch (boton.dataset.accion) {
+          case 'limpiar': limpiar(); break;
+          case 'borrar': borrar(); break;
+          case 'signo': cambiarSigno(); break;
+          case 'igual': igual(); break;
+        }
+      });
+
+      var equivalentes = { '*': '×', '/': '÷', '-': '−' };
+
+      document.addEventListener('keydown', function (evento) {
+        if (evento.ctrlKey || evento.metaKey || evento.altKey) { return; }
+        var tecla = evento.key;
+
+        if (tecla >= '0' && tecla <= '9') {
+          agregar(tecla);
+        } else if (tecla === '.' || tecla === ',' || tecla === '+' || tecla === '^' ||
+                   tecla === '(' || tecla === ')') {
+          agregar(tecla === ',' ? '.' : tecla);
+        } else if (equivalentes[tecla]) {
+          agregar(equivalentes[tecla]);
+        } else if (tecla === 'Enter' || tecla === '=') {
+          igual();
+        } else if (tecla === 'Backspace') {
+          borrar();
+        } else if (tecla === 'Escape') {
+          limpiar();
+        } else {
+          return;
+        }
+
+        evento.preventDefault();
+      });
+
+      refrescar();
+    })();
+  </script>
+</body>
+</html>
