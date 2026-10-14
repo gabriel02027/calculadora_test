@@ -54,6 +54,21 @@
       if (pos === inicio) {
         fallo('se esperaba un número');
       }
+      // Exponente: deja reutilizar un resultado como 1e13
+      if (origen.charAt(pos) === 'e' || origen.charAt(pos) === 'E') {
+        var marca = pos;
+        pos += 1;
+        if (origen.charAt(pos) === '+' || origen.charAt(pos) === '-') {
+          pos += 1;
+        }
+        var inicioExponente = pos;
+        while (pos < origen.length && origen.charAt(pos) >= '0' && origen.charAt(pos) <= '9') {
+          pos += 1;
+        }
+        if (pos === inicioExponente) {
+          pos = marca;
+        }
+      }
       var valor = Number(origen.slice(inicio, pos));
       if (!isFinite(valor)) {
         fallo('número inválido');

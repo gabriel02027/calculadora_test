@@ -80,6 +80,12 @@ prueba('1+2) -> carácter inesperado', fallaCon('1+2)', 'inesperado'));
 prueba('abc -> se esperaba un número', fallaCon('abc', 'mero'));
 prueba('1..2 -> carácter inesperado', fallaCon('1..2', 'inesperado'));
 
+console.log('Notación científica');
+prueba('1e3 = 1000', da('1e3', 1000));
+prueba('1.5e2 = 150', da('1.5e2', 150));
+prueba('1e-3 = 0.001', da('1e-3', 0.001));
+prueba('un resultado se puede volver a escribir', da('1.000000e13', 1e13));
+
 console.log('Formato del resultado');
 prueba('0.1+0.2 se muestra como 0.3', function () {
   assert.strictEqual(formatear(0.1 + 0.2), '0.3');
